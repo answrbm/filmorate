@@ -3,7 +3,7 @@ package ansarbektassov.model;
 import ansarbektassov.dto.UserRequestDTO;
 
 import java.time.LocalDate;
-import java.util.UUID;
+import java.util.*;
 
 //целочисленный идентификатор — id;
 //электронная почта — email;
@@ -17,9 +17,11 @@ public class User {
     private String login;
     private String name;
     private LocalDate birthday;
+    private Set<String> friends;
 
     public User() {
         this.userId = UUID.randomUUID().toString();
+        this.friends = new HashSet<>();
     }
 
     public User(String email, String login, String name, LocalDate birthday) {
@@ -28,6 +30,7 @@ public class User {
         this.login = login;
         this.name = name;
         this.birthday = birthday;
+        this.friends = new HashSet<>();
     }
 
     public User(UserRequestDTO userRequestDTO) {
@@ -80,6 +83,14 @@ public class User {
 
     public void setBirthday(LocalDate birthday) {
         this.birthday = birthday;
+    }
+
+    public Set<String> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(Set<String> friends) {
+        this.friends = friends;
     }
 
     @Override

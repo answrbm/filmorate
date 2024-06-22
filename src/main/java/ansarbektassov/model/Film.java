@@ -4,6 +4,8 @@ package ansarbektassov.model;
 import ansarbektassov.dto.FilmRequestDTO;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 //целочисленный идентификатор — id;
@@ -18,9 +20,11 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private Integer duration;
+    private Set<String> likes;
 
     public Film() {
         this.filmId = UUID.randomUUID().toString();
+        this.likes = new HashSet<>();
     }
 
     public Film(String name, String description, LocalDate releaseDate, Integer duration) {
@@ -29,6 +33,7 @@ public class Film {
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
+        this.likes = new HashSet<>();
     }
 
     public Film(FilmRequestDTO filmRequestDTO) {
@@ -77,6 +82,14 @@ public class Film {
 
     public void setDuration(Integer duration) {
         this.duration = duration;
+    }
+
+    public Set<String> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(Set<String> likes) {
+        this.likes = likes;
     }
 
     @Override

@@ -3,9 +3,12 @@ package ansarbektassov.controller;
 import ansarbektassov.dto.FilmRequestDTO;
 import ansarbektassov.exception.FilmNotCreatedException;
 import ansarbektassov.model.Film;
+import ansarbektassov.model.User;
+import ansarbektassov.service.FilmService;
 import ansarbektassov.utils.ErrorBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 //добавление фильма;
 //обновление фильма;
@@ -21,11 +25,12 @@ import java.util.HashMap;
 @RequestMapping("/films")
 public class FilmController {
 
-    private final HashMap<String, Film> films;
+    private final FilmService filmService;
     private final Logger log;
 
-    public FilmController() {
-        this.films = new HashMap<>();
+    @Autowired
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
         this.log = LoggerFactory.getLogger(FilmController.class);
     }
 
@@ -42,9 +47,8 @@ public class FilmController {
             }
         }
         Film film = new Film(filmRequestDTO);
-        films.put(film.getFilmId(),film);
         log.debug("Film created");
-        return film;
+        return filmService.createFilm(film);
     }
 
     @PutMapping("/{filmId}")
@@ -60,15 +64,28 @@ public class FilmController {
             }
         }
         Film film = new Film(filmRequestDTO);
-        film.setFilmId(filmId);
-        films.put(filmId,film);
         log.debug("Film updated");
-        return film;
+        return filmService.updateFilm(filmId,film);
     }
 
     @GetMapping
     public Collection<Film> getAllFilms() {
-        return films.values();
+        return filmService.getAllFilms();
+    }
+
+    @PutMapping("/films/{filmId}/like/{userId}")
+    public User likeFilm(@PathVariable("filmId") String filmId, @PathVariable("userId") String userId) {
+        return filmService.addLike(filmId,userId);
+    }
+
+    @DeleteMapping("/films/{filmId}/like/{userId}")
+    public User removeLike(@PathVariable("filmId") String filmId, @PathVariable("userId") String userId) {
+        return filmService.removeLike(filmId,userId);
+    }
+
+    @GetMapping("/films/popular")
+    public List<Film> getMostPopularFilms(@RequestParam("count") int count) {
+        return filmService.getMostPopularFilms(count);
     }
 
 }

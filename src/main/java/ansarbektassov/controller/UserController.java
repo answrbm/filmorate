@@ -1,19 +1,20 @@
 package ansarbektassov.controller;
 
 import ansarbektassov.dto.UserRequestDTO;
-import ansarbektassov.exception.FilmNotCreatedException;
 import ansarbektassov.exception.UserNotCreatedException;
 import ansarbektassov.model.User;
+import ansarbektassov.service.UserService;
 import ansarbektassov.utils.ErrorBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Set;
 
 //создание пользователя;
 //обновление пользователя;
@@ -22,11 +23,12 @@ import java.util.HashMap;
 @RequestMapping("/users")
 public class UserController {
 
-    private final HashMap<String, User> users;
+    private final UserService usersService;
     private final Logger log;
 
-    public UserController() {
-        this.users = new HashMap<>();
+    @Autowired
+    public UserController(UserService userService) {
+        this.usersService = userService;
         this.log = LoggerFactory.getLogger(UserController.class);
     }
 
@@ -43,9 +45,8 @@ public class UserController {
             }
         }
         User user = new User(userRequestDTO);
-        users.put(user.getUserId(),user);
         log.debug("User created");
-        return user;
+        return usersService.createUser(user);
     }
 
     @PutMapping("/{userId}")
@@ -61,16 +62,32 @@ public class UserController {
             }
         }
         User user = new User(userRequestDTO);
-        user.setUserId(userId);
-        users.put(userId,user);
         log.debug("User updated");
-        return user;
+        return usersService.updateUser(userId,user);
     }
 
     @GetMapping
     public Collection<User> getAllUsers() {
-        return users.values();
+        return usersService.getAllUsers();
     }
 
+    @PutMapping("/{userId}/friends/{friendId}")
+    public User addFriend(@PathVariable("userId") String userId, @PathVariable("friendId") String friendId) {
+        return usersService.addFriend(userId,friendId);
+    }
 
+    @DeleteMapping("/{userId}/friends/{friendId}")
+    public User deleteFriend(@PathVariable("userId") String userId, @PathVariable("friendId") String friendId) {
+        return usersService.deleteFriend(userId,friendId);
+    }
+
+    @GetMapping("/{userId}/friends")
+    public Set<String> getAllFriends(@PathVariable("userId") String userId, @PathVariable("friendId") String friendId) {
+        return usersService.findAllFriends(userId);
+    }
+
+    @GetMapping("/users/{userId}/friends/common/{friendId}")
+    public Set<String> getCommonFriends(@PathVariable("userId") String userId, @PathVariable("friendId") String friendId) {
+        return usersService.findCommonFriends(userId,friendId);
+    }
 }
